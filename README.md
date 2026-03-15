@@ -17,7 +17,7 @@ Notes:
 ![depiction 001](https://github.com/benfpv/cvplt/assets/55154673/b530c88e-9a92-4d31-a2aa-99e7ac4c821c)
 
 # Repository Contents
-1. main.py
+1. demo.py
 2. cvplt.py
 3. LICENSE
 4. README.md
@@ -28,18 +28,18 @@ Notes:
 3. cv2 (opencv-python)
 
 # Instructions to Run the Demo
-1. Run main.py with Python.
-2. See main.py > Main.loop() for the inputs used to create the demo plots.
+1. Run `demo.py` with Python.
+2. See `demo.py` > `Main.loop()` for the inputs used to create the demo plots.
 3. Expected outcome: The demo plots should be plotted onto a 640x480 window.
-4. Exit the demo by pressing "Ctrl+C" in the command prompt or terminal.
+4. Exit the demo by pressing `Ctrl+C` in the command prompt or terminal.
 
 ![dispArray_Resize](https://github.com/benfpv/cvplt/assets/55154673/5c392636-13fb-45b8-88a1-12eb04732261)
 
 # Instructions for Custom Use in Your Own Projects
 1. Ensure your project environment meets the requirements above.
-2. Add "cvplt.py" script to your project directory.
-3. Import "cvplt.py" in your script where you intend to call cvplt functions (e.g., from cvplt import *)
-4. Call the cvplt function(s) as you wish (e.g., cvplt.draw_plot(data)). Please see "Functions" section for available functions and their input(s) & output(s).
+2. Add `cvplt.py` to your project directory.
+3. Import it: `from cvplt import *`
+4. Call the public functions listed below.  All other functions are private (prefixed `_`) and are not intended for direct use.
 
 # Functions
 1. draw_plot(data, renderArray=None, plotBeginXY=None, plotEndXY=None, plotTitle="", plotBackgroundColour=[2,2,2], plotOutlineColour=[250,250,250], plotValuesColour=[250,250,250])
@@ -68,8 +68,7 @@ Notes:
   		- plotValuesColour: Numpy array or List (B,G,R), BGR colour that you want the plotted data values to be. Defaults to white (e.g., [250,250,250]).
 
 # Known Limitations & Future Directions
-- Update README.md assets etc.
-- Update methods of determining sizing of points and lines to look more appropriate and/or coherent in some situations (e.g., one-point plotting may look wierd compared to line thickness, coordinates plotting may need sizing adjustment based on density [e.g., smaller points when many coordinates are grouped together]).
-- Add ability to add lines between each point in draw_plot_coords() (i.e., connectDots logic).
-- Add method to plot 2D neural networks.
-- Possibly add method to plot 3D+ neural networks? May need be part of a different repo that allows interaction with plots (e.g., to rotate the neural network around in 3D).
+- Update README.md assets (screenshots).
+- Improve sizing heuristics for points and lines so they look coherent across different data densities (e.g., smaller points when many coordinates are grouped together).
+- Implement `connectDots` logic in `draw_plot_coords()` to optionally draw lines between coordinate points.
+- Add a method to visualise 2-D neural networks.

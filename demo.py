@@ -1,3 +1,8 @@
+"""
+Demo for cvplt — overlays several example plots onto a 640x480 BGR array
+and displays the result in an OpenCV window for 30 seconds.
+Run: python demo.py  |  Exit: Ctrl+C
+"""
 import numpy as np
 import time
 import cv2
@@ -6,19 +11,14 @@ from cvplt import *
 
 class Main:
     def __init__(self):
-        # User Parameters
-        self.renderResTuple = (640,480)
-        self.dispResTuple = (640,480)
-        # Auto-Inferred Parameters
-        self.renderCenterTuple = cvplt.get_screencenter(self.renderResTuple)
-        # Create Render & Display Arrays
-        self.backgroundColour = [80,80,80] # E.g., 80, [80, 80, 80]
-        self.renderArray = cvplt.get_screenarray_colour(self.renderResTuple, self.backgroundColour)
-        self.dispArray = cvplt.get_screenarray_colour(self.dispResTuple, self.backgroundColour)
+        self.renderResTuple = (640,480)   # off-screen render resolution (W, H)
+        self.dispResTuple = (640,480)     # display window resolution  (W, H)
+        self.backgroundColour = [80,80,80]  # [B,G,R] or scalar
+        self.renderArray = cvplt._get_screenarray_colour(self.renderResTuple, self.backgroundColour)
+        self.dispArray = cvplt._get_screenarray_colour(self.dispResTuple, self.backgroundColour)
         
     def loop(self):
-        ### Data ### 
-        # This section is where data updates would be handled - all are static for this demo, since demo is only 1 loop.
+        # Demo data — in a real app this would be live/updated each loop.
         data_demo_0 = np.array([10,20,30,np.nan,25,25,np.nan,1,1,2,3,4,5,np.nan,15,15,np.nan,15,np.nan,15,np.nan,15])
         data_demo_1 = (np.random.rand(240)*100)-50
         data_demo_1[40:80] = np.nan
@@ -27,10 +27,10 @@ class Main:
         data_demo_3 = (np.random.rand(300)*10000)-5000
         data_demo_3[200::] = np.nan
         data_demo_4 = (np.random.rand(550)*10000)-5000
-        data_demo_5 = np.array([5.5])
+        data_demo_5 = np.array([5.5])  # single-point demo
         data_demo_coords = np.array([[-1,-5],[-20,-2],[0,0],[0,5],[10,10],[10,0]], dtype="int")
-        ### Do Loop ###
-        # This is where data is fed into cvplt functions to plot onto the render array.
+
+        # Composite each plot onto the render array; print timing per plot.
         t_0 = time.time()
         self.renderArray = cvplt.draw_plot(data_demo_0)
         t_1 = time.time()
@@ -55,37 +55,27 @@ class Main:
         self.renderArray = cvplt.draw_plot(data_demo_5, renderArray=self.renderArray, plotBeginXY=[200,0], plotEndXY=[280,50], plotTitle="Demo Plot 5", plotBackgroundColour=[120,60,120], plotOutlineColour=[30,30,90], plotValuesColour=[240,200,200])
         t_6 = time.time()
         print("data_demo_5: {}".format(t_6 - t_5))
-        # Do Coords Plotting
         t_6 = time.time()
         self.renderArray = cvplt.draw_plot_coords(data_demo_coords, self.renderArray, plotBeginXY=[200,200], plotEndXY=[380,280], plotTitle="Demo Plot Coords", plotBackgroundColour=[200,200,200], plotOutlineColour=[10,10,10], plotValuesColour=[10,100,60])
         t_7 = time.time()
         print("data_demo_coords: {}".format(t_7 - t_6))
-        # Do Neurons Plotting
-        t_7 = time.time()
-        
-        t_8 = time.time()
-        print("data_demo_neurons: {}".format(t_8 - t_7))
-        # Draw Loop
+
         self.draw()
-        return
     
     def draw(self):
         self.dispArray = cv2.resize(self.renderArray, self.dispResTuple)
         cv2.imshow("dispArray", self.dispArray)
         cv2.waitKey(1)
-        return 
 
 if __name__ == "__main__":
-    # Main Init
-    print("----- Main Init -----")
+    print("----- Demo Init -----")
     main = Main()
-    # Main Loop
-    print("--- Main Loop ---")
+    print("--- Demo Loop ---")
     main.loop()
-    # End
-    print("--- Main End ---")
+    print("--- Demo End ---")
     end_sleep_duration = 30
     for i in range(end_sleep_duration):
-        print("\rPaused for {} /{} Seconds. Press 'Ctrl+C' in Command Prompt to Unpause & Exit.".format(i, end_sleep_duration), end="", flush=True)
-        time.sleep(1)
-    time.sleep(30)
+        print("\rPaused for {}/{} seconds. Press Ctrl+C to exit.".format(i + 1, end_sleep_duration), end="", flush=True)
+        # Use waitKey instead of time.sleep to keep the OpenCV window responsive.
+        cv2.waitKey(1000)
+    cv2.destroyAllWindows()
