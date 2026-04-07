@@ -1,5 +1,4 @@
-"""
-Demo for cvplt — overlays several example plots onto a 640x480 BGR array
+"""Demo for cvplt -- overlays several example plots onto a 640x480 BGR array
 and displays the result in an OpenCV window for 30 seconds.
 Run: python demo.py  |  Exit: Ctrl+C
 """
@@ -7,7 +6,7 @@ import numpy as np
 import time
 import cv2
 
-from cvplt import *
+from cvplt import cvplt
 
 class Main:
     def __init__(self):
@@ -18,7 +17,7 @@ class Main:
         self.dispArray = cvplt._get_screenarray_colour(self.dispResTuple, self.backgroundColour)
         
     def loop(self):
-        # Demo data — in a real app this would be live/updated each loop.
+        # Demo data -- in a real app this would be live/updated each loop.
         data_demo_0 = np.array([10,20,30,np.nan,25,25,np.nan,1,1,2,3,4,5,np.nan,15,15,np.nan,15,np.nan,15,np.nan,15])
         data_demo_1 = (np.random.rand(240)*100)-50
         data_demo_1[40:80] = np.nan

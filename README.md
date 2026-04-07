@@ -1,74 +1,118 @@
 # cvplt
-cvplt is a small collection of python functions to quickly and easily plot a Numpy Array to a Numpy Image Array (Rows x Columns x Colour[B,G,R]), for the purpose of plotting via opencv-python (i.e., cv2) imshow().
 
-Since drawing a plot with opencv-python is computationally quicker than plotting traditionally with matplotlib, cvplt solutions may be preferred for quick-and-dirty plotting of dynamic data in real-time (at only a moderate cost to aesthetics :)).
-
-Currently supports the following plotting methods:
-- Overlay a Numpy 1D Array to a Numpy Image Array, with undefined X-axis.
-- Overlay a Numpy Coordinates Array (e.g., [[0,0],[1,1],[9,10]]) to a Numpy Image Array.
-
-Notes:
-- How are np.Nan's handled?
-	- Numpy 1D Array inputs can include np.Nan's - they are simply omitted from plots.
-	- Numpy Coordinate Array inputs should not include any np.Nan's.
-- Singular data points are plotted as points (i.e., cv2.circle() function).
-- Pairs of data points are plotted as lines (i.e., cv2.line() function).
+Lightweight NumPy-to-OpenCV plotting. Composite line plots and scatter plots directly onto BGR image arrays for real-time display with `cv2.imshow()` -- faster than matplotlib, at a moderate cost to aesthetics.
 
 ![depiction 001](https://github.com/benfpv/cvplt/assets/55154673/b530c88e-9a92-4d31-a2aa-99e7ac4c821c)
 
-# Repository Contents
-1. demo.py
-2. cvplt.py
-3. LICENSE
-4. README.md
+## Features
 
-# Requirements
-1. python 3.12.10 (probably also works on other versions)
-2. numpy
-3. cv2 (opencv-python)
+- **1-D line plot** -- overlay a NumPy 1-D array onto any BGR or grayscale image.
+- **2-D scatter plot** -- overlay an Nx2 coordinate array as filled circles.
+- NaN-safe: `np.nan` values in 1-D data are simply skipped.
+- Single data points are drawn as dots; adjacent pairs as lines.
+- Auto-creates a 640x480 canvas when no `renderArray` is supplied.
 
-# Instructions to Run the Demo
-1. Run `demo.py` with Python.
-2. See `demo.py` > `Main.loop()` for the inputs used to create the demo plots.
-3. Expected outcome: The demo plots should be plotted onto a 640x480 window.
-4. Exit the demo by pressing `Ctrl+C` in the command prompt or terminal.
+## Requirements
+
+- Python >= 3.10
+- numpy >= 1.26
+- opencv-python >= 4.11
+
+Install with:
+
+```bash
+pip install -r requirements.txt
+```
+
+## Quick Start
+
+```python
+import numpy as np
+from cvplt import cvplt
+
+# Create a 1-D plot on an auto-sized canvas
+data = np.random.rand(200) * 100
+img = cvplt.draw_plot(data, plotTitle="My Plot")
+
+# Composite a scatter plot onto an existing image
+coords = np.array([[10, 20], [30, 40], [50, 10]], dtype="int")
+img = cvplt.draw_plot_coords(coords, img, plotBeginXY=[100, 100], plotEndXY=[300, 250])
+
+import cv2
+cv2.imshow("result", img)
+cv2.waitKey(0)
+```
+
+## Demo
+
+```bash
+python demo.py
+```
+
+Overlays seven example plots onto a 640x480 window and pauses for 30 seconds. Press `Ctrl+C` to exit early.
 
 ![dispArray_Resize](https://github.com/benfpv/cvplt/assets/55154673/5c392636-13fb-45b8-88a1-12eb04732261)
 
-# Instructions for Custom Use in Your Own Projects
-1. Ensure your project environment meets the requirements above.
-2. Add `cvplt.py` to your project directory.
-3. Import it: `from cvplt import *`
-4. Call the public functions listed below.  All other functions are private (prefixed `_`) and are not intended for direct use.
+## API Reference
 
-# Functions
-1. draw_plot(data, renderArray=None, plotBeginXY=None, plotEndXY=None, plotTitle="", plotBackgroundColour=[2,2,2], plotOutlineColour=[250,250,250], plotValuesColour=[250,250,250])
-	- Required:  
-		- data: Numpy 1D array (e.g., [0, np.nan, 5, 2.2]) you wish to plot. Must be length > 0.
-	- Optional:
-		- renderArray: Numpy image array (# of Rows, # of Columns, Colour(B,G,R)), a BGR image which you want to add your plot to. If none provided, defaults to 640x480.
-  		- plotBeginXY: Numpy array or List (X, Y), XY coordinates of beginning or top-left of plot (inclusive). Defaults to fit the renderArray.
-  		- plotEndXY: Numpy array or List (X, Y), XY coordinates of end or bottom-right of plot (inclusive). Defaults to fit the renderArray.
-  		- plotTitle: String, title of the plot you wish to be presented in the top-middle of the plot. Defaults to "".
-  		- plotBackgroundColour: Numpy array or List (B,G,R), BGR colour that you want the plot background to be. Defaults to black (e.g., [2,2,2]).
-  		- plotOutlineColour: Numpy array or List (B,G,R), BGR colour that you want the plot outline and text to be. Defaults to white (e.g., [250,250,250]).
-  		- plotValuesColour: Numpy array or List (B,G,R), BGR colour that you want the plotted data values to be. Defaults to white (e.g., [250,250,250]).
+All functions are static methods on the `cvplt` class. Functions prefixed with `_` are private helpers and not intended for direct use.
 
-2. draw_plot_coords(data, renderArray=None, connectDots=False, plotBeginXY=None, plotEndXY=None, plotTitle="", plotBackgroundColour=[2,2,2], plotOutlineColour=[250,250,250], plotValuesColour=[250,250,250])
-	- Required:  
-		- data: Numpy coordinates array (e.g., [[0,0],[2,2] ... [X,Y]]) you wish to plot (each coordinate == one point). Must be length > 0.
-	- Optional:
-  		- renderArray: Numpy array (# of Rows, # of Columns, Colour(B,G,R)), a BGR image which you want to add your plot to. If none provided, defaults to 640x480.
-  		- connectDots: Boolean, whether to connect the dots with lines or not. *** Currently this is not yet working ***.
-		- plotBeginXY: Numpy array or List (X, Y), XY coordinates of beginning or top-left of plot (inclusive). Defaults to fit the renderArray.
-  		- plotEndXY: Numpy array or List (X, Y), XY coordinates of end or bottom-right of plot (inclusive). Defaults to fit the renderArray.
-  		- plotTitle: String, title of the plot you wish to be presented in the top-middle of the plot. Defaults to "".
-  		- plotBackgroundColour: Numpy array or List (B,G,R), BGR colour that you want the plot background to be. Defaults to black (e.g., [2,2,2]).
-  		- plotOutlineColour: Numpy array or List (B,G,R), BGR colour that you want the plot outline and text to be. Defaults to white (e.g., [250,250,250]).
-  		- plotValuesColour: Numpy array or List (B,G,R), BGR colour that you want the plotted data values to be. Defaults to white (e.g., [250,250,250]).
+### `cvplt.draw_plot(data, ...)`
 
-# Known Limitations & Future Directions
-- Update README.md assets (screenshots).
-- Improve sizing heuristics for points and lines so they look coherent across different data densities (e.g., smaller points when many coordinates are grouped together).
-- Implement `connectDots` logic in `draw_plot_coords()` to optionally draw lines between coordinate points.
+Overlay a 1-D data series onto a BGR render array.
+
+| Parameter | Type | Default | Description |
+|---|---|---|---|
+| `data` | `np.ndarray` | *(required)* | 1-D array of values. May contain `np.nan`. |
+| `renderArray` | `np.ndarray` | `None` | Destination BGR/grayscale image. Auto-created (min 640x480) if `None`. |
+| `plotBeginXY` | `list` | `None` | Top-left `[x, y]` of the plot region. Defaults to full image. |
+| `plotEndXY` | `list` | `None` | Bottom-right `[x, y]` of the plot region. Defaults to full image. |
+| `plotTitle` | `str` | `""` | Label drawn beside the max value. |
+| `plotBackgroundColour` | `list\|int` | `[2,2,2]` | BGR fill colour for the plot area. |
+| `plotOutlineColour` | `list\|int` | `[250,250,250]` | BGR border and text colour. |
+| `plotValuesColour` | `list\|int` | `[250,250,250]` | BGR colour for data lines/dots. |
+
+**Returns:** `np.ndarray` -- the render array with the plot composited.
+
+**Raises:** `TypeError` if `data` is not a numpy array; `ValueError` if `data` is not 1-D.
+
+### `cvplt.draw_plot_coords(data, ...)`
+
+Overlay 2-D coordinate data as a scatter plot.
+
+| Parameter | Type | Default | Description |
+|---|---|---|---|
+| `data` | `np.ndarray` | *(required)* | Nx2 integer array of `[x, y]` coordinates. No NaNs. |
+| `renderArray` | `np.ndarray` | `None` | Destination image. Auto-created (min 640x480) if `None`. |
+| `connectDots` | `bool` | `False` | Connect consecutive points with lines. **Not yet implemented** -- raises `NotImplementedError`. |
+| `plotBeginXY` | `list` | `None` | Top-left `[x, y]`. |
+| `plotEndXY` | `list` | `None` | Bottom-right `[x, y]`. |
+| `plotTitle` | `str` | `""` | Label drawn beside the coordinate range. |
+| `plotBackgroundColour` | `list\|int` | `[2,2,2]` | BGR fill colour. |
+| `plotOutlineColour` | `list\|int` | `[250,250,250]` | BGR border/text colour. |
+| `plotValuesColour` | `list\|int` | `[250,250,250]` | BGR dot colour. |
+
+**Returns:** `np.ndarray` -- the render array with the plot composited.
+
+**Raises:** `TypeError` if `data` is not a numpy array; `ValueError` if `data` is not shape (N, 2); `NotImplementedError` if `connectDots=True`.
+
+## Repository Contents
+
+| File | Purpose |
+|---|---|
+| `cvplt.py` | Core library |
+| `demo.py` | Visual demo |
+| `tests/test_cvplt.py` | Unit tests |
+| `requirements.txt` | Runtime dependencies |
+| `pyproject.toml` | Package metadata |
+| `LICENSE` | MIT License |
+
+## License
+
+MIT -- see [LICENSE](LICENSE).
+
+## Known Limitations & Future Directions
+
+- Improve sizing heuristics for points/lines across different data densities.
+- Implement `connectDots` in `draw_plot_coords()`.
 - Add a method to visualise 2-D neural networks.

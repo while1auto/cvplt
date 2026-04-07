@@ -7,8 +7,8 @@ class cvplt:
     # --- Public API ---
 
     def draw_plot(data, renderArray=None, plotBeginXY=None, plotEndXY=None,
-                  plotTitle="", plotBackgroundColour=[2,2,2],
-                  plotOutlineColour=[250,250,250], plotValuesColour=[250,250,250]):
+                  plotTitle="", plotBackgroundColour=None,
+                  plotOutlineColour=None, plotValuesColour=None):
         """
         Overlay a 1-D data series onto a BGR render array.
 
@@ -22,13 +22,27 @@ class cvplt:
             plotBeginXY (list, optional): Top-left [x, y] of the plot region.
             plotEndXY (list, optional): Bottom-right [x, y] of the plot region.
             plotTitle (str): Label shown next to the max value.
-            plotBackgroundColour (list|int): BGR fill colour. Default [2,2,2].
-            plotOutlineColour (list|int): BGR border/text colour. Default [250,250,250].
-            plotValuesColour (list|int): BGR data colour. Default [250,250,250].
+            plotBackgroundColour (list|int, optional): BGR fill colour. Default [2,2,2].
+            plotOutlineColour (list|int, optional): BGR border/text colour. Default [250,250,250].
+            plotValuesColour (list|int, optional): BGR data colour. Default [250,250,250].
 
         Returns:
             np.ndarray: renderArray with the plot composited onto it.
+
+        Raises:
+            TypeError: If *data* is not a numpy array.
+            ValueError: If *data* is not 1-D.
         """
+        if not isinstance(data, np.ndarray):
+            raise TypeError("data must be a numpy array")
+        if data.ndim != 1:
+            raise ValueError("data must be 1-D")
+        if plotBackgroundColour is None:
+            plotBackgroundColour = [2, 2, 2]
+        if plotOutlineColour is None:
+            plotOutlineColour = [250, 250, 250]
+        if plotValuesColour is None:
+            plotValuesColour = [250, 250, 250]
         dataLen = len(data)
         dataCount = np.count_nonzero(~np.isnan(data))
         # Guard: if data is empty or all-NaN, return early before any nanmin/nanmax calls.
@@ -89,8 +103,8 @@ class cvplt:
         return renderArray
         
     def draw_plot_coords(data, renderArray=None, connectDots=False, plotBeginXY=None, plotEndXY=None,
-                         plotTitle="", plotBackgroundColour=[2,2,2],
-                         plotOutlineColour=[250,250,250], plotValuesColour=[250,250,250]):
+                         plotTitle="", plotBackgroundColour=None,
+                         plotOutlineColour=None, plotValuesColour=None):
         """
         Overlay 2-D coordinate data onto a BGR render array.
 
@@ -98,20 +112,37 @@ class cvplt:
         must be finite integers (no NaNs).
 
         Args:
-            data (np.ndarray): N×2 integer array of [x, y] coordinates.
+            data (np.ndarray): Nx2 integer array of [x, y] coordinates.
             renderArray (np.ndarray, optional): Destination image.  Created
                 automatically (min 640x480) if None.
             connectDots (bool): Connect consecutive points. *Not yet implemented.*
             plotBeginXY (list, optional): Top-left [x, y] of the plot region.
             plotEndXY (list, optional): Bottom-right [x, y] of the plot region.
             plotTitle (str): Label shown next to the coordinate range.
-            plotBackgroundColour (list|int): BGR fill colour. Default [2,2,2].
-            plotOutlineColour (list|int): BGR border/text colour. Default [250,250,250].
-            plotValuesColour (list|int): BGR dot colour. Default [250,250,250].
+            plotBackgroundColour (list|int, optional): BGR fill colour. Default [2,2,2].
+            plotOutlineColour (list|int, optional): BGR border/text colour. Default [250,250,250].
+            plotValuesColour (list|int, optional): BGR dot colour. Default [250,250,250].
 
         Returns:
             np.ndarray: renderArray with the plot composited onto it.
+
+        Raises:
+            TypeError: If *data* is not a numpy array.
+            ValueError: If *data* is not 2-D with shape (N, 2).
+            NotImplementedError: If *connectDots* is True.
         """
+        if not isinstance(data, np.ndarray):
+            raise TypeError("data must be a numpy array")
+        if data.ndim != 2 or data.shape[1] != 2:
+            raise ValueError("data must have shape (N, 2)")
+        if connectDots:
+            raise NotImplementedError("connectDots is not yet implemented")
+        if plotBackgroundColour is None:
+            plotBackgroundColour = [2, 2, 2]
+        if plotOutlineColour is None:
+            plotOutlineColour = [250, 250, 250]
+        if plotValuesColour is None:
+            plotValuesColour = [250, 250, 250]
         dataLen = len(data)
         # Guard: nothing to plot if data is empty.
         if dataLen < 1:
@@ -327,9 +358,6 @@ class cvplt:
             coordinates[0] = coord[0]+dataBufferSize[0]
             coordinates[1] = coord[1]+dataBufferSize[1]
             plotArray = cv2.circle(plotArray, coordinates, radius=dotSize, color=plotValuesColour, thickness=-1)
-        # Connect Dots if applicable
-        if connectDots:
-            pass
         return plotArray
     
     def _plotArray_draw_text(plotTitle, plotArray, plotArraySize, dataRange, plotOutlineColour):
